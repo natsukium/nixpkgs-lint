@@ -52,7 +52,73 @@ lazy_static! {
                 type_of_query: QueryType::List,
                 type_of_fix: TypeOfFix::Remove,
             })
-        )
+        ),
+        (
+            "UnnecessaryWheel",
+            (AQuery {
+                name: "unnecessary wheel in build-system".to_string(),
+                solution: "remove this from build-system".to_string(),
+                what: r"wheel".to_string(),
+                in_what: "build-system".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Remove,
+            })
+        ),
+        (
+            "PythonPackageInNativeBuildInputs",
+            (AQuery {
+                name: "python package in nativeBuildInputs".to_string(),
+                solution: "move this from nativeBuildInputs to build-system".to_string(),
+                what: r"setuptools|setuptools-scm|hatchling|flit-core|poetry-core|pdm-backend|wheel|maturinBuildHook|".to_string(),
+                in_what: "nativeBuildInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Move,
+            })
+        ),
+        (
+            "RemovePytestCov",
+            (AQuery {
+                name: "pytest-cov in nativeCheckInputs".to_string(),
+                solution: "remove this from nativeCheckInputs or change to pytest-cov-stub".to_string(),
+                what: r"pytest-cov".to_string(),
+                in_what: "nativeCheckInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Remove,
+            })
+        ),
+        (
+            "NonFunctionalTestingToolInNativeCheckInputs",
+            (AQuery {
+                name: "non functional testing tool in nativeCheckInputs".to_string(),
+                solution: "remove this from nativeCheckInputs".to_string(),
+                what: r"pytest-benchmark|pytest-runner|flake8|black|isort|coverage|ruff".to_string(),
+                in_what: "nativeCheckInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Remove,
+            })
+        ),
+        (
+            "DeprecatedTestingToolInNativeCheckInputs",
+            (AQuery {
+                name: "deprecated testing tool in nativeCheckInputs".to_string(),
+                solution: "remove this from nativeCheckInputs".to_string(),
+                what: r"nose".to_string(),
+                in_what: "nativeCheckInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Remove,
+            })
+        ),
+        (
+            "BarePytestInNativeCheckInputs",
+            (AQuery {
+                name: "bare pytest in nativeCheckInputs".to_string(),
+                solution: "change pytest to pytestCheckHook".to_string(),
+                what: r"pytest".to_string(),
+                in_what: "nativeCheckInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
     ]);
 }
 
