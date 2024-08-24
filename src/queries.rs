@@ -87,11 +87,22 @@ lazy_static! {
             })
         ),
         (
+            "PytestBenchmarkInNativeCheckInputs",
+            (AQuery {
+                name: "pytest-benchmark in nativeCheckInputs".to_string(),
+                solution: "remove this from nativeCheckInputs or pass `--benchmark-disable` to pytestFlagsArray".to_string(),
+                what: r"pytest-benchmark".to_string(),
+                in_what: "nativeCheckInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Remove,
+            })
+        ),
+        (
             "NonFunctionalTestingToolInNativeCheckInputs",
             (AQuery {
                 name: "non functional testing tool in nativeCheckInputs".to_string(),
                 solution: "remove this from nativeCheckInputs".to_string(),
-                what: r"pytest-benchmark|pytest-runner|flake8|black|isort|coverage|ruff".to_string(),
+                what: r"pytest-runner|flake8|black|isort|coverage|ruff".to_string(),
                 in_what: "nativeCheckInputs".to_string(),
                 type_of_query: QueryType::List,
                 type_of_fix: TypeOfFix::Remove,
