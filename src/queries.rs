@@ -76,6 +76,17 @@ lazy_static! {
             })
         ),
         (
+            "VersionedPackageInDependencies",
+            (AQuery {
+                name: "versioned package in dependencies".to_string(),
+                solution: "change `package_X_Y` to `package`".to_string(),
+                what: r"[a-z0-9-]+_[0-9]+".to_string(),
+                in_what: "dependencies".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
             "RemovePytestCov",
             (AQuery {
                 name: "pytest-cov in nativeCheckInputs".to_string(),
