@@ -1,5 +1,9 @@
 # Semantic linter for Nixpkgs using tree-sitter 🌳 + ❄️
 
+> [!WARNING]
+> This branch has a lot of experimental features for python builders, such as `buildPythonPackage`.
+> The lint rules are incomplete and may be changed.
+
 [![asciicast](https://asciinema.org/a/523585.svg)](https://asciinema.org/a/523585)
 
 This is a semantic linter for Nixpkgs that uses
@@ -8,6 +12,16 @@ we have the following detections:
 
 - [x] `cmake`, `makeWrapper`, `pkg-config` in `buildInputs`
 - [x] redundant packages from `stdenv` in `nativeBuildInputs`
+
+In addition, we add the following detections for python builders:
+
+- [x] `wheel` in `build-system`
+- [x] python packages in `nativeBuildInputs`
+- [x] versioned packages like `numpy_2` in `dependencies`
+- [x] non functional testing tools in `nativeCheckInputs`
+- [x] bare `pytest` in `nativeCheckInputs`
+- [ ] unnormalized pname
+- [ ] missing `pyproject`, `build-system`, `pythonImportsCheck`, etc.
 
 ## Features
 - **Fast**: lints all of Nixpkgs in under 3 seconds
