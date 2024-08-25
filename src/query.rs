@@ -38,9 +38,19 @@ pub struct AQuery {
 impl AQuery {
     pub fn query_string(&self) -> String {
         match self.type_of_query {
-            QueryType::List | QueryType::String => format!(
+            QueryType::List => format!(
                 "(
                     (binding attrpath: _ @a expression: _ @l)
+                    (#eq? @a \"{}\")
+                    (#match? @l \"{}\")
+                ) @q",
+                self.in_what, self.what
+            ),
+            QueryType::String => format!(
+                "(
+                    (binding attrpath: _ @a 
+                        expression: (string_expression (string_fragment) @l)
+                    )
                     (#eq? @a \"{}\")
                     (#match? @l \"{}\")
                 ) @q",
