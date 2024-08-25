@@ -120,6 +120,17 @@ lazy_static! {
             })
         ),
         (
+            "RedundantPackageInNativeBuildInputs",
+            (AQuery {
+                name: "redundant package in nativeBuildInputs".to_string(),
+                solution: "remove this from nativeBuildInputs".to_string(),
+                what: r"pythonRelaxDepsHook".to_string(),
+                in_what: "nativeBuildInputs".to_string(),
+                type_of_query: QueryType::List,
+                type_of_fix: TypeOfFix::Move,
+            })
+        ),
+        (
             "VersionedPackageInDependencies",
             (AQuery {
                 name: "versioned package in dependencies".to_string(),
