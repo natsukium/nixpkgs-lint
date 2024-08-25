@@ -54,7 +54,40 @@ lazy_static! {
             })
         ),
         (
-            "UnnormalizedPname",
+            "StartsWithDefiniteOrIndefiniteArticleInDescription",
+            (AQuery {
+                name: "starts with definite or indefinite article in description".to_string(),
+                solution: "remove a definite/indefinite article from meta.description".to_string(),
+                what: r"^(A|The) ".to_string(),
+                in_what: "description".to_string(),
+                type_of_query: QueryType::String,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "NoCapitalizationInDescription",
+            (AQuery {
+                name: "no capitalization in description".to_string(),
+                solution: "be capitalized".to_string(),
+                what: r"^[a-z]".to_string(),
+                in_what: "description".to_string(),
+                type_of_query: QueryType::String,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "EndsWithPeriodInDescription",
+            (AQuery {
+                name: "ends with period in description".to_string(),
+                solution: "remove a period from meta.description".to_string(),
+                what: r"\\.$".to_string(),
+                in_what: "description".to_string(),
+                type_of_query: QueryType::String,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "UnnormalizePname",
             (AQuery {
                 name: "unnormalized pname".to_string(),
                 solution: "normalize this according to PEP503, for example, lowercase and use `-` instead of `.` and `_`".to_string(),
