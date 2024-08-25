@@ -20,7 +20,7 @@ In addition, we add the following detections for python builders:
 - [x] versioned packages like `numpy_2` in `dependencies`
 - [x] non functional testing tools in `nativeCheckInputs`
 - [x] bare `pytest` in `nativeCheckInputs`
-- [ ] unnormalized pname
+- [x] unnormalized pname
 - [ ] missing `pyproject`, `build-system`, `pythonImportsCheck`, etc.
 
 ## Features

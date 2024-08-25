@@ -93,6 +93,12 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
                             }
                             _ => {}
                         },
+                        QueryType::String => match n.kind() {
+                            "string_expression" => {
+                                match_vec.push(match_to_push(text_from_node(&n, text)));
+                            }
+                            _ => {}
+                        },
                         QueryType::BindingAStringInsteadOfList => {
                             match n.kind() {
                                 "binding" => {
@@ -115,6 +121,14 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
                         }
                         QueryType::ArgToOptionalAList => {
                             if n.kind() == "apply_expression" {
+                                whole_text = text_from_node(&n, text);
+                                match_vec.push(match_to_push(whole_text.clone()));
+                                // we only want the first apply_expression
+                                break;
+                            }
+                        }
+                        QueryType::Pname => {
+                            if n.kind() == "string_expression" {
                                 whole_text = text_from_node(&n, text);
                                 match_vec.push(match_to_push(whole_text.clone()));
                                 // we only want the first apply_expression

@@ -11,6 +11,8 @@ pub enum QueryType {
     BindingAStringInsteadOfList,
     ArgToOptionalAList,
     XInFormals,
+    String,
+    Pname, // TODO(natsukium): need refactor
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -36,7 +38,7 @@ pub struct AQuery {
 impl AQuery {
     pub fn query_string(&self) -> String {
         match self.type_of_query {
-            QueryType::List => format!(
+            QueryType::List | QueryType::String => format!(
                 "(
                     (binding attrpath: _ @a expression: _ @l)
                     (#eq? @a \"{}\")
@@ -73,6 +75,18 @@ impl AQuery {
                     (match? @q \"{}\")
                 )",
                 self.what
+            ),
+            QueryType::Pname => String::from(
+                "(
+                    (apply_expression function: _ @f
+                        argument: (_ (_ (binding attrpath: _ @a
+                            expression: (string_expression (string_fragment) @l)
+                        )))
+                    )
+                    (#not-eq? @f \"fetchPypi\")
+                    (#eq? @a \"pname\")
+                    (#match? @l \"[A-Z._]\")
+                ) @q",
             ),
         }
     }

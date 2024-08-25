@@ -54,6 +54,17 @@ lazy_static! {
             })
         ),
         (
+            "UnnormalizedPname",
+            (AQuery {
+                name: "unnormalized pname".to_string(),
+                solution: "normalize this according to PEP503, for example, lowercase and use `-` instead of `.` and `_`".to_string(),
+                what: String::new(),
+                in_what: String::new(),
+                type_of_query: QueryType::Pname,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
             "UnnecessaryWheel",
             (AQuery {
                 name: "unnecessary wheel in build-system".to_string(),
