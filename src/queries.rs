@@ -98,6 +98,28 @@ lazy_static! {
             })
         ),
         (
+            "DeprecatedFormatAttributeUsage",
+            (AQuery {
+                name: "deprecated format attribute usage".to_string(),
+                solution: "set `pyproject = true` instead".to_string(),
+                what: r"setuptools|pyproject".to_string(),
+                in_what: "format".to_string(),
+                type_of_query: QueryType::String,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "DeprecatedFormatOtherAttributeUsage",
+            (AQuery {
+                name: "deprecated format attribute usage".to_string(),
+                solution: "set `pyproject = false` instead".to_string(),
+                what: r"other".to_string(),
+                in_what: "format".to_string(),
+                type_of_query: QueryType::String,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
             "UnnecessaryWheel",
             (AQuery {
                 name: "unnecessary wheel in build-system".to_string(),

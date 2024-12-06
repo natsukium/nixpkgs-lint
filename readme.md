@@ -21,6 +21,7 @@ In addition, we add the following detections for python builders:
 - [x] non functional testing tools in `nativeCheckInputs`
 - [x] bare `pytest` in `nativeCheckInputs`
 - [x] unnormalized pname
+- [x] deprecated attributes, such as `format`
 - [ ] missing `pyproject`, `build-system`, `pythonImportsCheck`, etc.
 
 ## Features
