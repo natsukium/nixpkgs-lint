@@ -11,6 +11,7 @@ lazy_static! {
             (AQuery {
                 name: "build time tool in buildInputs".to_string(),
                 solution: "move this from buildInputs to nativeBuildInputs".to_string(),
+                context: String::new(),
                 what: "cmake|makeWrapper|pkg-config|intltool|autoreconfHook".to_string(),
                 in_what: "buildInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -22,6 +23,7 @@ lazy_static! {
             (AQuery {
                 name: "*Flags not a list".to_string(),
                 solution: "convert to a list".to_string(),
+                context: String::new(),
                 what: String::new(),
                 in_what: "Flags".to_string(),
                 type_of_query: QueryType::BindingAStringInsteadOfList,
@@ -33,11 +35,24 @@ lazy_static! {
             (AQuery {
                 name: "Arg to lib.optional is a list".to_string(),
                 solution: "change lib.optional to lib.optionals".to_string(),
+                context: String::new(),
                 what: String::new(),
                 in_what: String::new(),
                 type_of_query: QueryType::ArgToOptionalAList,
                 type_of_fix: TypeOfFix::Change,
             }),
+        ),
+        (
+            "UnnormalizedPythonPname",
+            (AQuery {
+                name: "unnormalized python pname".to_string(),
+                solution: "normalize this according to PEP503, for example, lowercase and use `-` instead of `.` and `_`".to_string(),
+                context: "buildPythonPackage".to_string(),
+                what: "[A-Z._]".to_string(),
+                in_what: "pname".to_string(),
+                type_of_query: QueryType::AttrValueInContext,
+                type_of_fix: TypeOfFix::Change,
+            })
         ),
     ]);
 
@@ -47,6 +62,7 @@ lazy_static! {
             (AQuery {
                 name: "redundant package from stdenv in nativeBuildInputs".to_string(),
                 solution: "remove this from nativeBuildInputs".to_string(),
+                context: String::new(),
                 what: r"coreutils|findutils|diffutils|gnugrep|gawk|gnutar|gzip|bzip2\.bin|gnumake|bash|patch|xz\.bin|file".to_string(),
                 in_what: "nativeBuildInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -58,6 +74,7 @@ lazy_static! {
             (AQuery {
                 name: "starts with definite or indefinite article in description".to_string(),
                 solution: "remove a definite/indefinite article from meta.description".to_string(),
+                context: String::new(),
                 what: r"^(A|The) ".to_string(),
                 in_what: "description".to_string(),
                 type_of_query: QueryType::String,
@@ -69,6 +86,7 @@ lazy_static! {
             (AQuery {
                 name: "no capitalization in description".to_string(),
                 solution: "be capitalized".to_string(),
+                context: String::new(),
                 what: r"^[a-z]".to_string(),
                 in_what: "description".to_string(),
                 type_of_query: QueryType::String,
@@ -80,6 +98,7 @@ lazy_static! {
             (AQuery {
                 name: "ends with period in description".to_string(),
                 solution: "remove a period from meta.description".to_string(),
+                context: String::new(),
                 what: r"\\.$".to_string(),
                 in_what: "description".to_string(),
                 type_of_query: QueryType::String,
@@ -98,21 +117,11 @@ lazy_static! {
             })
         ),
         (
-            "UnnormalizePname",
-            (AQuery {
-                name: "unnormalized pname".to_string(),
-                solution: "normalize this according to PEP503, for example, lowercase and use `-` instead of `.` and `_`".to_string(),
-                what: String::new(),
-                in_what: String::new(),
-                type_of_query: QueryType::Pname,
-                type_of_fix: TypeOfFix::Change,
-            })
-        ),
-        (
             "DeprecatedFormatAttributeUsage",
             (AQuery {
                 name: "deprecated format attribute usage".to_string(),
                 solution: "set `pyproject = true` instead".to_string(),
+                context: String::new(),
                 what: r"setuptools|pyproject".to_string(),
                 in_what: "format".to_string(),
                 type_of_query: QueryType::String,
@@ -124,6 +133,7 @@ lazy_static! {
             (AQuery {
                 name: "deprecated format attribute usage".to_string(),
                 solution: "set `pyproject = false` instead".to_string(),
+                context: String::new(),
                 what: r"other".to_string(),
                 in_what: "format".to_string(),
                 type_of_query: QueryType::String,
@@ -135,6 +145,7 @@ lazy_static! {
             (AQuery {
                 name: "unnecessary wheel in build-system".to_string(),
                 solution: "remove this from build-system".to_string(),
+                context: String::new(),
                 what: r"wheel".to_string(),
                 in_what: "build-system".to_string(),
                 type_of_query: QueryType::List,
@@ -146,6 +157,7 @@ lazy_static! {
             (AQuery {
                 name: "python package in nativeBuildInputs".to_string(),
                 solution: "move this from nativeBuildInputs to build-system".to_string(),
+                context: String::new(),
                 what: r"setuptools|setuptools-scm|hatchling|flit-core|poetry-core|pdm-backend|wheel|maturinBuildHook|".to_string(),
                 in_what: "nativeBuildInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -157,6 +169,7 @@ lazy_static! {
             (AQuery {
                 name: "redundant package in nativeBuildInputs".to_string(),
                 solution: "remove this from nativeBuildInputs".to_string(),
+                context: String::new(),
                 what: r"pythonRelaxDepsHook".to_string(),
                 in_what: "nativeBuildInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -168,6 +181,7 @@ lazy_static! {
             (AQuery {
                 name: "versioned package in dependencies".to_string(),
                 solution: "change `package_X_Y` to `package`".to_string(),
+                context: String::new(),
                 what: r"[a-z0-9-]+_[0-9]+".to_string(),
                 in_what: "dependencies".to_string(),
                 type_of_query: QueryType::List,
@@ -179,6 +193,7 @@ lazy_static! {
             (AQuery {
                 name: "pytest-cov in nativeCheckInputs".to_string(),
                 solution: "remove this from nativeCheckInputs or change to pytest-cov-stub".to_string(),
+                context: String::new(),
                 what: r"pytest-cov".to_string(),
                 in_what: "nativeCheckInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -190,6 +205,7 @@ lazy_static! {
             (AQuery {
                 name: "pytest-benchmark in nativeCheckInputs".to_string(),
                 solution: "remove this from nativeCheckInputs or pass `--benchmark-disable` to pytestFlagsArray".to_string(),
+                context: String::new(),
                 what: r"pytest-benchmark".to_string(),
                 in_what: "nativeCheckInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -201,6 +217,7 @@ lazy_static! {
             (AQuery {
                 name: "non functional testing tool in nativeCheckInputs".to_string(),
                 solution: "remove this from nativeCheckInputs".to_string(),
+                context: String::new(),
                 what: r"pytest-runner|flake8|black|isort|coverage|ruff".to_string(),
                 in_what: "nativeCheckInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -212,6 +229,7 @@ lazy_static! {
             (AQuery {
                 name: "deprecated testing tool in nativeCheckInputs".to_string(),
                 solution: "remove this from nativeCheckInputs".to_string(),
+                context: String::new(),
                 what: r"nose".to_string(),
                 in_what: "nativeCheckInputs".to_string(),
                 type_of_query: QueryType::List,
@@ -223,6 +241,7 @@ lazy_static! {
             (AQuery {
                 name: "bare pytest in nativeCheckInputs".to_string(),
                 solution: "change pytest to pytestCheckHook".to_string(),
+                context: String::new(),
                 what: r"pytest".to_string(),
                 in_what: "nativeCheckInputs".to_string(),
                 type_of_query: QueryType::List,

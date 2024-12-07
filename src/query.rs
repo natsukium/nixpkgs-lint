@@ -12,8 +12,8 @@ pub enum QueryType {
     ArgToOptionalAList,
     XInFormals,
     String,
-    Pname, // TODO(natsukium): need refactor
     RecursiveAttrSet,
+    AttrValueInContext,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -32,6 +32,7 @@ pub struct AQuery {
     /// examples: "pkg-config", "cmake|makeWrapper"
     pub what: String,
     pub in_what: String,
+    pub context: String,
     pub type_of_query: QueryType,
     pub type_of_fix: TypeOfFix,
 }
@@ -87,18 +88,6 @@ impl AQuery {
                 )",
                 self.what
             ),
-            QueryType::Pname => String::from(
-                "(
-                    (apply_expression function: _ @f
-                        argument: (_ (_ (binding attrpath: _ @a
-                            expression: (string_expression (string_fragment) @l)
-                        )))
-                    )
-                    (#not-eq? @f \"fetchPypi\")
-                    (#eq? @a \"pname\")
-                    (#match? @l \"[A-Z._]\")
-                ) @q",
-            ),
             QueryType::RecursiveAttrSet => format!(
                 "(
                     (apply_expression
@@ -108,6 +97,20 @@ impl AQuery {
                     (#match? @f \"{}\")
                 ) @q",
                 self.in_what
+            ),
+            QueryType::AttrValueInContext => format!(
+                "(
+                    (apply_expression 
+                        function: _ @f
+                        argument: (_ (_ (binding 
+                            attrpath: _ @a
+                            expression: (string_expression _ @q)
+                    ))))
+                    (#eq? @f \"{}\")
+                    (#eq? @a \"{}\")
+                    (#match? @q \"{}\")
+                )",
+                self.context, self.in_what, self.what,
             ),
         }
     }

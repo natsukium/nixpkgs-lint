@@ -127,16 +127,10 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
                                 break;
                             }
                         }
-                        QueryType::Pname => {
-                            if n.kind() == "string_expression" {
-                                whole_text = text_from_node(&n, text);
-                                match_vec.push(match_to_push(whole_text.clone()));
-                                // we only want the first apply_expression
-                                break;
+                                match_vec.push(match_to_push(text_from_node(&n, text)));
                             }
-                        }
-                        QueryType::XInFormals => match n.kind() {
-                            "identifier" if q.what_to_pred().eval(&text_from_node(&n, text)) => {
+                            _ => {}
+                        },
                                 match_vec.push(match_to_push(text_from_node(&n, text)));
                             }
                             _ => {}
@@ -149,6 +143,12 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
                                 break;
                             }
                         }
+                        QueryType::AttrValueInContext => match n.kind() {
+                            "string_fragment" => {
+                                match_vec.push(match_to_push(text_from_node(&n, text)));
+                            }
+                            _ => {}
+                        },
                     }
                 }
             }
@@ -210,6 +210,42 @@ mod tests {
                 byte_range: 139..144,
                 list_byte_range: 94..160,
                 query: QUERIES.get("BuildTimeToolInBuildInputs").unwrap().clone(),
+            }),
+        ];
+
+        assert_eq!(result, expected)
+    }
+
+    #[test]
+    fn find_lints_python_pname() {
+        let expr = String::from(
+            "{ buildPythonPackage, fetchPypi }:
+
+            buildPythonPackage rec {
+              pname = \"unnormalized_pname\";
+
+              src = fetchPypi {
+                pname = \"should_be_ignore\";
+              };
+            }",
+        );
+        let mut queries: Vec<AQuery> = Vec::new();
+        add_default_queries(&mut queries);
+        let result = find_lints("", &expr, &queries, &false);
+
+        let expected = [
+            (AMatch { 
+                file: "".to_string(), 
+                message: "unnormalized python pname".to_string(), 
+                matched: "unnormalized_pname".to_string(),
+                fix: "normalize this according to PEP503, for example, lowercase and use `-` instead of `.` and `_`".to_string(),
+                type_of_fix: Change,
+                line: 4,
+                column: 24,
+                end_column: 42,
+                byte_range: 96..114,
+                list_byte_range: 0..0,
+                query: QUERIES.get("UnnormalizedPythonPname").unwrap().clone(),
             }),
         ];
 
