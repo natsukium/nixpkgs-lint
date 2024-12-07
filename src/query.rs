@@ -13,6 +13,7 @@ pub enum QueryType {
     XInFormals,
     String,
     Pname, // TODO(natsukium): need refactor
+    RecursiveAttrSet,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
@@ -97,6 +98,16 @@ impl AQuery {
                     (#eq? @a \"pname\")
                     (#match? @l \"[A-Z._]\")
                 ) @q",
+            ),
+            QueryType::RecursiveAttrSet => format!(
+                "(
+                    (apply_expression
+                        function: _ @f
+                        argument: (rec_attrset_expression)
+                    )
+                    (#match? @f \"{}\")
+                ) @q",
+                self.in_what
             ),
         }
     }

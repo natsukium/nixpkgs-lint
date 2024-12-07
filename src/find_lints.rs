@@ -141,6 +141,14 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
                             }
                             _ => {}
                         },
+                        QueryType::RecursiveAttrSet => {
+                            if n.kind() == "rec_attrset_expression" {
+                                whole_text = text_from_node(&n, text);
+                                match_vec.push(match_to_push(whole_text.clone()));
+                                // we only want the first apply_expression
+                                break;
+                            }
+                        }
                     }
                 }
             }

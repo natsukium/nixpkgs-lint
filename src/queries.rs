@@ -87,6 +87,17 @@ lazy_static! {
             })
         ),
         (
+            "RecKeywordWithMkDerivation",
+            (AQuery {
+                name: "rec keyword with mkDerivation".to_string(),
+                solution: "consider to use finalAttrs pattern".to_string(),
+                what: String::new(),
+                in_what: "mkDerivation".to_string(),
+                type_of_query: QueryType::RecursiveAttrSet,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
             "UnnormalizePname",
             (AQuery {
                 name: "unnormalized pname".to_string(),
