@@ -127,22 +127,32 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
                                 break;
                             }
                         }
+                        QueryType::XInFormals => match n.kind() {
+                            "identifier" if q.what_to_pred().eval(&text_from_node(&n, text)) => {
                                 match_vec.push(match_to_push(text_from_node(&n, text)));
                             }
                             _ => {}
                         },
+                        QueryType::RecursiveAttrSet => match n.kind() {
+                            "rec_attrset_expression" => {
                                 match_vec.push(match_to_push(text_from_node(&n, text)));
                             }
                             _ => {}
                         },
-                        QueryType::RecursiveAttrSet => {
-                            if n.kind() == "rec_attrset_expression" {
-                                whole_text = text_from_node(&n, text);
-                                match_vec.push(match_to_push(whole_text.clone()));
+                        QueryType::AttrNameInFunction => match n.kind() {
+                            "identifier" => {
+                                match_vec.push(match_to_push(text_from_node(&n, text)));
+                            }
+                            _ => {}
+                        },
+                        QueryType::BindingWithExpression => match n.kind() {
+                            "with_expression" => {
+                                match_vec.push(match_to_push(text_from_node(&n, text)));
                                 // we only want the first apply_expression
                                 break;
                             }
-                        }
+                            _ => {}
+                        },
                         QueryType::AttrValueInContext => match n.kind() {
                             "string_fragment" => {
                                 match_vec.push(match_to_push(text_from_node(&n, text)));
@@ -160,9 +170,11 @@ pub fn find_lints(path: &str, text: &str, queries: &Vec<AQuery>, printtree: &boo
 #[cfg(test)]
 mod tests {
     use crate::queries::QUERIES;
+    use crate::queries::UNFINISHED_QUERIES;
     use crate::query::TypeOfFix::*;
     use crate::{
         queries::add_default_queries,
+        queries::add_unfinished_queries,
         query::{AMatch, AQuery},
     };
 
@@ -219,15 +231,15 @@ mod tests {
     #[test]
     fn find_lints_python_pname() {
         let expr = String::from(
-            "{ buildPythonPackage, fetchPypi }:
+            r#"{ buildPythonPackage, fetchPypi }:
 
             buildPythonPackage rec {
-              pname = \"unnormalized_pname\";
+              pname = "unnormalized_pname";
 
               src = fetchPypi {
-                pname = \"should_be_ignore\";
+                pname = "should_be_ignore";
               };
-            }",
+            }"#,
         );
         let mut queries: Vec<AQuery> = Vec::new();
         add_default_queries(&mut queries);
@@ -246,6 +258,79 @@ mod tests {
                 byte_range: 96..114,
                 list_byte_range: 0..0,
                 query: QUERIES.get("UnnormalizedPythonPname").unwrap().clone(),
+            }),
+        ];
+
+        assert_eq!(result, expected)
+    }
+
+    #[test]
+    fn find_lints_refs_tags() {
+        let expr = String::from(
+            r#"{ stdenv, fetchFromGitHub }:
+
+            stdenv.mkDerivation {
+              src = fetchFromGitHub {
+                owner = "test";
+                repo = "test";
+                rev = "refs/tags/${version}";
+                hash = "";
+              };
+            }"#,
+        );
+        let mut queries: Vec<AQuery> = Vec::new();
+        add_unfinished_queries(&mut queries);
+        let result = find_lints("", &expr, &queries, &false);
+
+        let expected = [
+            (AMatch { 
+                file: "".to_string(), 
+                message: "refs/tags with rev".to_string(), 
+                matched: "refs/tags/".to_string(),
+                fix: "replace rev with tag and remove the prefix, refs/tags/".to_string(),
+                type_of_fix: Change,
+                line: 7,
+                column: 24,
+                end_column: 34,
+                byte_range: 188..198,
+                list_byte_range: 0..0,
+                query: UNFINISHED_QUERIES.get("RefsTagsWithRev").unwrap().clone(),
+            }),
+        ];
+
+        assert_eq!(result, expected)
+    }
+
+    #[test]
+    fn find_lints_with_lib() {
+        let expr = String::from(
+            r#"{ stdenv, fetchFromGitHub }:
+
+            stdenv.mkDerivation {
+              meta = with lib; {
+                description = "";
+                homepage = "";
+                platforms = platforms.unix;
+              };
+            }"#,
+        );
+        let mut queries: Vec<AQuery> = Vec::new();
+        add_unfinished_queries(&mut queries);
+        let result = find_lints("", &expr, &queries, &false);
+
+        let expected = [
+            (AMatch { 
+                file: "".to_string(), 
+                message: "binding with expression".to_string(), 
+                matched: "with lib; {\n                description = \"\";\n                homepage = \"\";\n                platforms = platforms.unix;\n              }".to_string(),
+                fix: "remove with expression".to_string(),
+                type_of_fix: Change,
+                line: 4,
+                column: 22,
+                end_column: 16,
+                byte_range: 85..221,
+                list_byte_range: 0..0,
+                query: UNFINISHED_QUERIES.get("BindingWithExpression").unwrap().clone(),
             }),
         ];
 

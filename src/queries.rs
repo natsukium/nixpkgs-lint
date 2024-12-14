@@ -110,9 +110,46 @@ lazy_static! {
             (AQuery {
                 name: "rec keyword with mkDerivation".to_string(),
                 solution: "consider to use finalAttrs pattern".to_string(),
+                context: String::new(),
                 what: String::new(),
                 in_what: "mkDerivation".to_string(),
                 type_of_query: QueryType::RecursiveAttrSet,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "RefsTagsWithRev",
+            (AQuery {
+                name: "refs/tags with rev".to_string(),
+                solution: "replace rev with tag and remove the prefix, refs/tags/".to_string(),
+                context: "fetchFromGitHub".to_string(),
+                what: "^refs/tags/".to_string(),
+                in_what: "rev".to_string(),
+                type_of_query: QueryType::AttrValueInContext,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "SRIHash",
+            (AQuery {
+                name: "SRI hash".to_string(),
+                solution: "replace this with hash".to_string(),
+                context: String::new(),
+                what: "sha256".to_string(),
+                in_what: "fetchFromGitHub|fetchPypi".to_string(),
+                type_of_query: QueryType::AttrNameInFunction,
+                type_of_fix: TypeOfFix::Change,
+            })
+        ),
+        (
+            "BindingWithExpression",
+            (AQuery {
+                name: "binding with expression".to_string(),
+                solution: "remove with expression".to_string(),
+                context: String::new(),
+                what: "lib".to_string(),
+                in_what: "meta".to_string(),
+                type_of_query: QueryType::BindingWithExpression,
                 type_of_fix: TypeOfFix::Change,
             })
         ),

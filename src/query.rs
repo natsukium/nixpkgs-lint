@@ -13,6 +13,8 @@ pub enum QueryType {
     XInFormals,
     String,
     RecursiveAttrSet,
+    AttrNameInFunction,
+    BindingWithExpression,
     AttrValueInContext,
 }
 
@@ -97,6 +99,29 @@ impl AQuery {
                     (#match? @f \"{}\")
                 ) @q",
                 self.in_what
+            ),
+            QueryType::BindingWithExpression => format!(
+                "(
+                    (binding
+                        attrpath: _ @a
+                        expression: (with_expression
+                            environment: _ @e
+                        )
+                    )
+                    (#eq? @a \"{}\")
+                    (#eq? @e \"{}\")
+                ) @q",
+                self.in_what, self.what,
+            ),
+            QueryType::AttrNameInFunction => format!(
+                "(
+                    (apply_expression function: _ @f
+                        argument: (_ (_ (binding attrpath: _ @q)))
+                    )
+                    (#match? @f \"{}\")
+                    (#eq? @q \"{}\")
+                )",
+                self.in_what, self.what,
             ),
             QueryType::AttrValueInContext => format!(
                 "(
